@@ -210,6 +210,10 @@ class InstallPatchelf(Command):
             print('Installing...')
             subprocess.check_call(['make', 'install'])
 
+    def get_outputs(self):
+        # XXX: Report our outputs?
+        return []
+
 
 custom_cmds = {
     'check_patchelf': CheckPatchelf,
