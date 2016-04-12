@@ -13,6 +13,9 @@ try:
 except ImportError:
     from urllib import urlretrieve
 
+version = '0.1.0.dev0'
+
+
 class pushd(object):
     def __init__(self, dirname, makedirs=False, mode=0o777, exist_ok=False):
         self.cwd = dirname
@@ -35,6 +38,7 @@ class pushd(object):
 
     def __exit__(self, type, value, traceback):
         os.chdir(self.old)
+
 
 class CheckPatchelf(Command):
     description = 'test'
@@ -228,7 +232,7 @@ except ImportError:
 
 setup(
     name='patchelf-wrapper',
-    version='0.1.0.dev0',
+    version=version,
 
     description='A wrapper for patchelf',
     long_description=long_desc,
