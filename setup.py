@@ -217,12 +217,20 @@ custom_cmds = {
 BuildCommand.sub_commands.append(('build_patchelf', lambda x: True))
 InstallCommand.sub_commands.append(('install_patchelf', lambda x: True))
 
+try:
+    import pypandoc
+    long_desc = pypandoc.convert(long_desc, 'rst', format='md')
+except ImportError:
+    pass
+
 setup(
     name='patchelf-wrapper',
     version='0.1.0.dev0',
 
     description='A wrapper for patchelf',
+    long_description=long_desc,
     keywords='patchelf',
+    url='https://github.com/jimporter/patchelf-wrapper',
 
     author='Jim Porter',
     author_email='porterj@alum.rit.edu',
