@@ -13,7 +13,7 @@ try:
 except ImportError:
     from urllib import urlretrieve
 
-version = '0.1.1'
+version = '0.1.2'
 
 
 class pushd(object):
@@ -61,7 +61,7 @@ class CheckPatchelf(Command):
     def run(self):
         try:
             output = subprocess.check_output(
-                ['which', 'patchelff'], universal_newlines=True
+                ['which', 'patchelf'], universal_newlines=True
             )
             print('Found patchelf at {}'.format(output.strip()))
             self.found_patchelf = True
