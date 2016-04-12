@@ -217,6 +217,9 @@ custom_cmds = {
 BuildCommand.sub_commands.append(('build_patchelf', lambda x: True))
 InstallCommand.sub_commands.append(('install_patchelf', lambda x: True))
 
+with open('README.md', 'r') as f:
+    long_desc = f.read()
+
 try:
     import pypandoc
     long_desc = pypandoc.convert(long_desc, 'rst', format='md')
