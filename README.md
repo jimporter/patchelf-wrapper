@@ -1,0 +1,30 @@
+# patchelf-wrapper
+
+**patchelf-wrapper** is a simple Python module that assists in the installation
+of the [*patchelf*](https://nixos.org/patchelf.html) utility. It's intended for
+use with PyPI-hosted Python projects that depend on patchelf. If you're an
+end-user of patchelf, you should look elsewhere! (Perhaps you're OS's package
+manager?)
+
+Currently, patchelf wrapper installs **patchelf 0.9**.
+
+## Usage
+
+Ordinarily, you'll just want to set `'patchelf-wrapper'` as one of your
+requirements (e.g. in `setup.py`). If installing directly, you can just use
+`python setup.py install` or `python setup.py build` as usual; this respects all
+the usual options, including automatically installing patchelf into the `bin`
+dir of a virtualenv if one is active.
+
+In addition, patchelf-wrapper contains the following setup commands beyond the
+defaults:
+
+* `check_patchelf`: Checks if patchelf is already installed on the system
+* `fetch_patchelf`: Fetches the patchelf tarball from the web
+* `build_patchelf`: Extract patchelf's source and build it
+* `install_patchelf`: Install patchelf to the chosen location
+
+## License
+
+This project is licensed under the BSD 3-clause license. Patchelf itself is
+licensed under the GPL, version 3.
