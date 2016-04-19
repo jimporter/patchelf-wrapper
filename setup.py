@@ -195,6 +195,7 @@ class InstallPatchelf(Command):
         self.build_dir = None
         self.skip_build = False
         self.force = False
+        self.outputs = []
 
     def finalize_options(self):
         self.set_undefined_options('build',
@@ -220,11 +221,15 @@ class InstallPatchelf(Command):
             print('Installing...')
             subprocess.check_call(['make', 'install'])
 
+            prefix = self.get_finalized_command('install').install_base
+        self.outputs = [
+            os.path.join(prefix, 'bin', 'patchelf'),
+            os.path.join(prefix, 'share', 'doc', 'patchelf', 'README'),
+            os.path.join(prefix, 'share', 'man', 'man1', 'patchelf.1')
+        ]
+
     def get_outputs(self):
-        prefix = self.get_finalized_command('install').install_base
-        return [os.path.join(prefix, 'bin', 'patchelf'),
-                os.path.join(prefix, 'share', 'doc', 'patchelf', 'README'),
-                os.path.join(prefix, 'share', 'man', 'man1', 'patchelf.1')]
+        return self.outputs
 
 
 custom_cmds = {
