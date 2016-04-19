@@ -15,7 +15,7 @@ try:
 except ImportError:
     from urllib import urlretrieve
 
-version = '1.0.0'
+version = '1.0.1'
 
 
 class pushd(object):
@@ -67,7 +67,7 @@ class CheckPatchelf(Command):
             )
             self.announce('Found patchelf at {}'.format(output.strip()),
                           log.INFO)
-            self.found_patchelf = False#True
+            self.found_patchelf = True
         except:
             self.announce('patchelf not found', log.INFO)
             self.found_patchelf = False
