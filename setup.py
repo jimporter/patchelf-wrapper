@@ -41,7 +41,7 @@ class pushd(object):
 
 
 class CheckPatchelf(Command):
-    description = 'test'
+    description = 'check for the existence of patchelf on the system'
     user_options = []
 
     def initialize_options(self):
@@ -71,7 +71,7 @@ class CheckPatchelf(Command):
 
 
 class FetchPatchelf(Command):
-    description = 'test'
+    description = 'fetch the source distribution of patchelf'
     user_options = [
         ('download-dir=','d', 'download directory (where to save tarball)'),
         ('force', 'f', 'force download'),
@@ -120,7 +120,7 @@ class FetchPatchelf(Command):
 
 
 class BuildPatchelf(Command):
-    description = 'test'
+    description = 'build the patchelf binary'
     user_options = [
         ('download-dir=','d', 'download directory (where to find tarball)'),
         ('build-dir=', 'b', 'directory for compiled executable'),
@@ -177,7 +177,7 @@ class BuildPatchelf(Command):
 
 
 class InstallPatchelf(Command):
-    description = 'test'
+    description = 'install the patchelf binary'
     user_options = [
         ('build-dir=', 'b', 'build directory (where to install from)'),
         ('skip-build', None, 'skip the build steps'),
@@ -263,7 +263,7 @@ setup(
         'Programming Language :: Python :: 3.0',
         'Programming Language :: Python :: 3.1',
         'Programming Language :: Python :: 3.2',
-        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
     ],
