@@ -109,6 +109,9 @@ class FetchPatchelf(Command):
             if self.get_finalized_command('check_patchelf').found_patchelf:
                 return
 
+        if self.dry_run:
+            return
+
         filename = os.path.basename(self.patchelf_url)
         with pushd(self.download_dir, makedirs=True, exist_ok=True):
             print('Downloading {}...'.format(self.patchelf_url))
@@ -147,6 +150,9 @@ class BuildPatchelf(Command):
                 return
 
         self.run_command('fetch_patchelf')
+
+        if self.dry_run:
+            return
 
         filename = os.path.join(
             self.download_dir, os.path.basename(FetchPatchelf.patchelf_url)
@@ -204,6 +210,9 @@ class InstallPatchelf(Command):
 
         if not self.skip_build:
             self.run_command('build_patchelf')
+
+        if self.dry_run:
+            return
 
         sub = self.get_finalized_command('fetch_patchelf').patchelf_name
         with pushd(os.path.join(self.build_dir, sub), makedirs=True,
