@@ -15,7 +15,7 @@ try:
 except ImportError:
     from urllib import urlretrieve
 
-version = '0.3.0pre'
+version = '1.0.0'
 
 
 class pushd(object):
@@ -269,7 +269,7 @@ setup(
     license='BSD',
 
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 5 - Production/Stable',
 
         'Intended Audience :: Developers',
         'Operating System :: POSIX :: Linux',
