@@ -5,6 +5,7 @@ import re
 import shutil
 import subprocess
 import tarfile
+from distutils import log
 from distutils.core import setup, Command
 from distutils.command.build import build as BuildCommand
 from distutils.command.install import install as InstallCommand
@@ -64,10 +65,11 @@ class CheckPatchelf(Command):
             output = subprocess.check_output(
                 ['which', 'patchelf'], universal_newlines=True
             )
-            print('Found patchelf at {}'.format(output.strip()))
-            self.found_patchelf = True
+            self.announce('Found patchelf at {}'.format(output.strip()),
+                          log.INFO)
+            self.found_patchelf = False#True
         except:
-            print('patchelf not found')
+            self.announce('patchelf not found', log.INFO)
             self.found_patchelf = False
 
 
@@ -114,7 +116,8 @@ class FetchPatchelf(Command):
 
         filename = os.path.basename(self.patchelf_url)
         with pushd(self.download_dir, makedirs=True, exist_ok=True):
-            print('Downloading {}...'.format(self.patchelf_url))
+            self.announce('Downloading {}...'.format(self.patchelf_url),
+                          log.INFO)
             urlretrieve(self.patchelf_url, filename)
 
             if self.sha256sum(filename) != self.sha256_hash:
@@ -163,10 +166,11 @@ class BuildPatchelf(Command):
             sub = self.get_finalized_command('fetch_patchelf').patchelf_name
 
             if os.path.exists(sub):
-                print('Cleaning {}'.format(sub))
+                self.announce('Cleaning {}'.format(sub), log.INFO)
                 shutil.rmtree(sub)
 
-            print('Extracting to {}/{}'.format(self.build_dir, sub))
+            self.announce('Extracting to {}/{}'.format(self.build_dir, sub),
+                          log.INFO)
             tar.extractall('.')
 
             with pushd(sub):
@@ -176,10 +180,11 @@ class BuildPatchelf(Command):
                 if prefix:
                     configure += ['--prefix', prefix]
 
-                print('Configuring: {}'.format(' '.join(configure)))
+                self.announce('Configuring: {}'.format(' '.join(configure)),
+                              log.INFO)
                 subprocess.check_call(configure)
 
-                print('Building...')
+                self.announce('Building...', log.INFO)
                 subprocess.check_call(['make'])
 
 
@@ -218,7 +223,6 @@ class InstallPatchelf(Command):
         sub = self.get_finalized_command('fetch_patchelf').patchelf_name
         with pushd(os.path.join(self.build_dir, sub), makedirs=True,
                    exist_ok=True):
-            print('Installing...')
             subprocess.check_call(['make', 'install'])
 
             prefix = self.get_finalized_command('install').install_base
