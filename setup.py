@@ -15,7 +15,7 @@ try:
 except ImportError:
     from urllib import urlretrieve
 
-version = '1.0.1'
+version = '1.1.0.dev0'
 
 
 class pushd(object):
