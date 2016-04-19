@@ -221,8 +221,10 @@ class InstallPatchelf(Command):
             subprocess.check_call(['make', 'install'])
 
     def get_outputs(self):
-        # XXX: Report our outputs?
-        return []
+        prefix = self.get_finalized_command('install').install_base
+        return [os.path.join(prefix, 'bin', 'patchelf'),
+                os.path.join(prefix, 'share', 'doc', 'patchelf', 'README'),
+                os.path.join(prefix, 'share', 'man', 'man1', 'patchelf.1')]
 
 
 custom_cmds = {
