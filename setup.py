@@ -1,6 +1,7 @@
 import errno
 import hashlib
 import os
+import re
 import shutil
 import subprocess
 import tarfile
@@ -226,7 +227,7 @@ BuildCommand.sub_commands.append(('build_patchelf', lambda x: True))
 InstallCommand.sub_commands.append(('install_patchelf', lambda x: True))
 
 with open('README.md', 'r') as f:
-    long_desc = f.read()
+    long_desc = re.sub(r'(^# patchelf-wrapper)\n\n(.+\n)*', r'\1', f.read())
 
 try:
     import pypandoc
@@ -267,6 +268,10 @@ setup(
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
     ],
+
+    extras_require={
+        'deploy': ['pypandoc'],
+    },
 
     cmdclass=custom_cmds,
 )

@@ -1,5 +1,7 @@
 # patchelf-wrapper
 
+[![PyPi version][pypi-image]][pypi-link]
+
 **patchelf-wrapper** is a simple Python module that assists in the installation
 of the [*patchelf*](https://nixos.org/patchelf.html) utility. It's intended for
 use with PyPI-hosted Python projects that depend on patchelf. If you're an
@@ -28,3 +30,6 @@ defaults:
 
 This project is licensed under the BSD 3-clause license. Patchelf itself is
 licensed under the GPL, version 3.
+
+[pypi-image]: https://img.shields.io/pypi/v/patchelf-wrapper.svg
+[pypi-link]: https://pypi.python.org/pypi/patchelf-wrapper
