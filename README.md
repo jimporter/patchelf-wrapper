@@ -5,7 +5,7 @@
 **patchelf-wrapper** is a simple Python module that assists in the installation
 of the [*patchelf*](https://nixos.org/patchelf.html) utility. It's intended for
 use with PyPI-hosted Python projects that depend on patchelf. If you're an
-end-user of patchelf, you should look elsewhere! (Perhaps you're OS's package
+end-user of patchelf, you should look elsewhere! (Perhaps your OS's package
 manager?)
 
 Currently, patchelf-wrapper installs **patchelf 0.9**.
