@@ -1,6 +1,7 @@
 # patchelf-wrapper
 
 [![PyPi version][pypi-image]][pypi-link]
+[![Travis build status][travis-image]][travis-link]
 
 **patchelf-wrapper** is a simple Python module that assists in the installation
 of the [*patchelf*](https://nixos.org/patchelf.html) utility. It's intended for
@@ -28,8 +29,10 @@ defaults:
 
 ## License
 
-This project is licensed under the BSD 3-clause license. Patchelf itself is
-licensed under the GPL, version 3.
+This project is licensed under the BSD 3-clause [license](LICENSE). Patchelf
+itself is licensed under the GPL, version 3.
 
 [pypi-image]: https://img.shields.io/pypi/v/patchelf-wrapper.svg
 [pypi-link]: https://pypi.python.org/pypi/patchelf-wrapper
+[travis-image]: https://travis-ci.org/jimporter/patchelf-wrapper.svg?branch=master
+[travis-link]: https://travis-ci.org/jimporter/patchelf-wrapper
