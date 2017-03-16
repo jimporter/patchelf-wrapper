@@ -7,9 +7,14 @@ import subprocess
 import tarfile
 from contextlib import contextmanager
 from distutils import log
-from distutils.core import setup, Command
 from distutils.command.build import build as BuildCommand
-from distutils.command.install import install as InstallCommand
+
+# Using setuptools is important here, since extremely old versions overwrote
+# the install command in a way that eats any custom sub_commands, which we use
+# to run `make install`.
+from setuptools import setup, Command
+from setuptools.command.install import install as InstallCommand
+
 
 try:
     from urllib.request import urlretrieve
