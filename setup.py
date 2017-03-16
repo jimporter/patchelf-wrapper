@@ -54,7 +54,7 @@ class CheckPatchelf(Command):
     def sha256sum(filename, blocksize=65536):
         sha = hashlib.sha256()
         with open(filename, 'rb') as f:
-            for block in iter(lambda: f.read(blocksize), b""):
+            for block in iter(lambda: f.read(blocksize), b''):
                 sha.update(block)
         return sha.hexdigest()
 
@@ -98,7 +98,7 @@ class FetchPatchelf(Command):
     def sha256sum(filename, blocksize=65536):
         sha = hashlib.sha256()
         with open(filename, 'rb') as f:
-            for block in iter(lambda: f.read(blocksize), b""):
+            for block in iter(lambda: f.read(blocksize), b''):
                 sha.update(block)
         return sha.hexdigest()
 
