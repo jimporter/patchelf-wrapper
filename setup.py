@@ -69,7 +69,7 @@ class CheckPatchelf(Command):
 class FetchPatchelf(Command):
     description = 'fetch the source distribution of patchelf'
     user_options = [
-        ('download-dir=','d', 'download directory (where to save tarball)'),
+        ('download-dir=', 'd', 'download directory (where to save tarball)'),
         ('force', 'f', 'force download'),
     ]
 
@@ -88,7 +88,6 @@ class FetchPatchelf(Command):
                                    ('build_base', 'download_dir'),
                                    ('force', 'force'))
         self.set_undefined_options('install', ('force', 'force'))
-
 
     @staticmethod
     def sha256sum(filename, blocksize=65536):
@@ -122,7 +121,7 @@ class FetchPatchelf(Command):
 class BuildPatchelf(Command):
     description = 'build the patchelf binary'
     user_options = [
-        ('download-dir=','d', 'download directory (where to find tarball)'),
+        ('download-dir=', 'd', 'download directory (where to find tarball)'),
         ('build-dir=', 'b', 'directory for compiled executable'),
         ('force', 'f', 'force building'),
     ]
