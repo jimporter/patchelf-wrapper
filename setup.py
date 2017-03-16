@@ -21,7 +21,7 @@ try:
 except ImportError:
     from urllib import urlretrieve
 
-version = '1.1.0.dev0'
+version = '1.0.2'
 
 
 @contextmanager
