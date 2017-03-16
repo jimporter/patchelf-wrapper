@@ -5,6 +5,7 @@ import re
 import shutil
 import subprocess
 import tarfile
+from contextlib import contextmanager
 from distutils import log
 from distutils.core import setup, Command
 from distutils.command.build import build as BuildCommand
@@ -18,28 +19,20 @@ except ImportError:
 version = '1.1.0.dev0'
 
 
-class pushd(object):
-    def __init__(self, dirname, makedirs=False, mode=0o777, exist_ok=False):
-        self.cwd = dirname
-        self.makedirs = makedirs
-        self.mode = mode
-        self.exist_ok = exist_ok
+@contextmanager
+def pushd(dirname, makedirs=False, mode=0o777, exist_ok=False):
+    old = os.getcwd()
+    if makedirs:
+        try:
+            os.makedirs(dirname, mode)
+        except OSError as e:
+            if ( not exist_ok or e.errno != errno.EEXIST or
+                 not os.path.isdir(dirname) ):
+                raise
 
-    def __enter__(self):
-        self.old = os.getcwd()
-        if self.makedirs:
-            try:
-                os.makedirs(self.cwd, self.mode)
-            except OSError as e:
-                if ( not self.exist_ok or e.errno != errno.EEXIST or
-                     not os.path.isdir(self.cwd) ):
-                    raise
-
-        os.chdir(self.cwd)
-        return self
-
-    def __exit__(self, type, value, traceback):
-        os.chdir(self.old)
+    os.chdir(dirname)
+    yield
+    os.chdir(old)
 
 
 class CheckPatchelf(Command):
