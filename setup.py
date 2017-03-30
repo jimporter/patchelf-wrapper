@@ -108,14 +108,18 @@ class FetchPatchelfCommand(Command):
 
         filename = os.path.basename(self.patchelf_url)
         with pushd(self.download_dir, makedirs=True, exist_ok=True):
-            self.announce('Downloading {}...'.format(self.patchelf_url),
-                          log.INFO)
-            urlretrieve(self.patchelf_url, filename)
+            if ( os.path.exists(filename) and
+                 self.sha256sum(filename) == self.sha256_hash ):
+                self.announce('Using cached {}'.format(filename))
+            else:
+                self.announce('Downloading {}...'.format(self.patchelf_url),
+                              log.INFO)
+                urlretrieve(self.patchelf_url, filename)
 
-            if self.sha256sum(filename) != self.sha256_hash:
-                raise RuntimeError(
-                    "{} doesn't match checksum".format(filename)
-                )
+                if self.sha256sum(filename) != self.sha256_hash:
+                    raise RuntimeError(
+                        "{} doesn't match checksum".format(filename)
+                    )
 
 
 class BuildPatchelfCommand(Command):
