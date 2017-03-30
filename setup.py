@@ -6,15 +6,10 @@ import shutil
 import subprocess
 import tarfile
 from contextlib import contextmanager
+from distutils.core import setup, Command
 from distutils import log
 from distutils.command.build import build as BuildCommand
-
-# Using setuptools is important here, since extremely old versions overwrote
-# the install command in a way that eats any custom sub_commands, which we use
-# to run `make install`.
-from setuptools import setup, Command
-from setuptools.command.install import install as InstallCommand
-
+from distutils.command.install import install as OrigInstallCommand
 
 try:
     from urllib.request import urlretrieve
@@ -40,7 +35,7 @@ def pushd(dirname, makedirs=False, mode=0o777, exist_ok=False):
     os.chdir(old)
 
 
-class CheckPatchelf(Command):
+class CheckPatchelfCommand(Command):
     description = 'check for the existence of patchelf on the system'
     user_options = []
 
@@ -71,7 +66,7 @@ class CheckPatchelf(Command):
             self.found_patchelf = False
 
 
-class FetchPatchelf(Command):
+class FetchPatchelfCommand(Command):
     description = 'fetch the source distribution of patchelf'
     user_options = [
         ('download-dir=', 'd', 'download directory (where to save tarball)'),
@@ -123,7 +118,7 @@ class FetchPatchelf(Command):
                 )
 
 
-class BuildPatchelf(Command):
+class BuildPatchelfCommand(Command):
     description = 'build the patchelf binary'
     user_options = [
         ('download-dir=', 'd', 'download directory (where to find tarball)'),
@@ -155,7 +150,8 @@ class BuildPatchelf(Command):
             return
 
         filename = os.path.join(
-            self.download_dir, os.path.basename(FetchPatchelf.patchelf_url)
+            self.download_dir,
+            os.path.basename(FetchPatchelfCommand.patchelf_url)
         )
         tar = tarfile.open(filename, 'r:gz')
 
@@ -185,7 +181,7 @@ class BuildPatchelf(Command):
                 subprocess.check_call(['make'])
 
 
-class InstallPatchelf(Command):
+class InstallPatchelfCommand(Command):
     description = 'install the patchelf binary'
     user_options = [
         ('build-dir=', 'b', 'build directory (where to install from)'),
@@ -233,15 +229,42 @@ class InstallPatchelf(Command):
         return self.outputs
 
 
+class InstallCommand(OrigInstallCommand):
+    """Override the install command with our own version so that setuptools
+    can't use *its* version of the install command. This is necessary because
+    older versions of setuptools try very hard to install this package as an
+    egg, which won't work."""
+
+    sub_commands = OrigInstallCommand.sub_commands + [
+        ('install_patchelf', lambda x: True)
+    ]
+
+    # Add options used by setuptools so that it thinks everything is ok.
+    user_options = OrigInstallCommand.user_options + [
+        ('old-and-unmanageable', None,
+         'provided for compatibility with setuptools'),
+        ('single-version-externally-managed', None,
+         'provided for compatibility with setuptools'),
+    ]
+    boolean_options = OrigInstallCommand.boolean_options + [
+        'old-and-unmanageable', 'single-version-externally-managed',
+    ]
+
+    def initialize_options(self):
+        OrigInstallCommand.initialize_options(self)
+        self.old_and_unmanageable = None
+        self.single_version_externally_managed = None
+
+
 custom_cmds = {
-    'check_patchelf': CheckPatchelf,
-    'fetch_patchelf': FetchPatchelf,
-    'build_patchelf': BuildPatchelf,
-    'install_patchelf': InstallPatchelf,
+    'check_patchelf':   CheckPatchelfCommand,
+    'fetch_patchelf':   FetchPatchelfCommand,
+    'build_patchelf':   BuildPatchelfCommand,
+    'install_patchelf': InstallPatchelfCommand,
+    'install':          InstallCommand,
 }
 
 BuildCommand.sub_commands.append(('build_patchelf', lambda x: True))
-InstallCommand.sub_commands.append(('install_patchelf', lambda x: True))
 
 with open('README.md', 'r') as f:
     long_desc = re.sub(r'(^# patchelf-wrapper)\n\n(.+\n)*', r'\1', f.read())

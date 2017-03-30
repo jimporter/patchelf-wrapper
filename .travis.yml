@@ -8,9 +8,25 @@ python:
   - 3.5
 os:
   - linux
+env:
+  - INSTALL_COMMAND="pip install ."
+  - INSTALL_COMMAND="python setup.py install"
+
+matrix:
+  include:
+    - python: 2.7
+      env:
+        - DEPS_COMMAND="pip install pip==1.1 && pip uninstall -y setuptools && pip install -U 'distribute==0.6.20'"
+        - INSTALL_COMMAND="pip install ."
+    - python: 2.7
+      env:
+        - DEPS_COMMAND="pip install pip==1.1 && pip uninstall -y setuptools && pip install -U 'distribute==0.6.20'"
+        - INSTALL_COMMAND="python setup.py install"
 
 before_install:
   - set -e
+install:
+  - eval ${DEPS_COMMAND}
 script:
-  - pip install .
+  - ${INSTALL_COMMAND}
   - which patchelf
