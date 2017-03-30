@@ -9,24 +9,36 @@ python:
 os:
   - linux
 env:
+  # Install the three main ways a package can get installed. The last one is a
+  # bit tricky, since we need to pretend that we're being run via setuptools.
+  # To do this, we just replace one of our distutils imports with a setuptools
+  # one and then run our setup command.
   - INSTALL_COMMAND="pip install ."
   - INSTALL_COMMAND="python setup.py install"
+  - INSTALL_COMMAND="sed -i s/distutils.core/setuptools/ setup.py && python setup.py bdist_egg"
 
 matrix:
+  # Explicitly run all the install commands using an old version of setuptools
+  # (known as distribute at the time).
   include:
     - python: 2.7
       env:
-        - DEPS_COMMAND="pip install pip==1.1 && pip uninstall -y setuptools && pip install -U 'distribute==0.6.20'"
+        - DEPS_COMMAND="pip install pip==1.1 && pip uninstall -y setuptools && pip install -U distribute==0.6.20"
         - INSTALL_COMMAND="pip install ."
     - python: 2.7
       env:
-        - DEPS_COMMAND="pip install pip==1.1 && pip uninstall -y setuptools && pip install -U 'distribute==0.6.20'"
+        - DEPS_COMMAND="pip install pip==1.1 && pip uninstall -y setuptools && pip install -U distribute==0.6.20"
         - INSTALL_COMMAND="python setup.py install"
+    - python: 2.7
+      env:
+        - DEPS_COMMAND="pip install pip==1.1 && pip uninstall -y setuptools && pip install -U distribute==0.6.20"
+        - INSTALL_COMMAND="sed -i s/distutils.core/setuptools/ setup.py && python setup.py bdist_egg"
 
 before_install:
   - set -e
 install:
   - eval ${DEPS_COMMAND}
 script:
-  - ${INSTALL_COMMAND}
+  - "! which patchelf"
+  - eval ${INSTALL_COMMAND}
   - which patchelf

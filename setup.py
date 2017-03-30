@@ -6,18 +6,17 @@ import shutil
 import subprocess
 import tarfile
 from contextlib import contextmanager
-from distutils.core import setup, Command
 from distutils import log
+from distutils.core import setup, Command
 from distutils.command.build import build as BuildCommand
-from distutils.command.install import install as OrigInstallCommand
+from distutils.command.install_lib import install_lib as OrigInstallLibCommand
+
+from patchelf_wrapper import version
 
 try:
     from urllib.request import urlretrieve
 except ImportError:
     from urllib import urlretrieve
-
-version = '1.0.4.dev0'
-
 
 @contextmanager
 def pushd(dirname, makedirs=False, mode=0o777, exist_ok=False):
@@ -159,12 +158,10 @@ class BuildPatchelfCommand(Command):
         )
         tar = tarfile.open(filename, 'r:gz')
 
+        self.run_command('clean_patchelf')
+
         with pushd(self.build_dir, makedirs=True, exist_ok=True):
             sub = self.get_finalized_command('fetch_patchelf').patchelf_name
-
-            if os.path.exists(sub):
-                self.announce('Cleaning {}'.format(sub), log.INFO)
-                shutil.rmtree(sub)
 
             self.announce('Extracting to {}/{}'.format(self.build_dir, sub),
                           log.INFO)
@@ -183,6 +180,29 @@ class BuildPatchelfCommand(Command):
 
                 self.announce('Building...', log.INFO)
                 subprocess.check_call(['make'])
+
+
+class CleanPatchelfCommand(Command):
+    description = 'clean the patchelf build directoy'
+    user_options = [
+        ('build-dir=', 'b', 'directory for compiled executable'),
+    ]
+
+    def initialize_options(self):
+        self.download_dir = None
+        self.build_dir = None
+        self.force = False
+
+    def finalize_options(self):
+        self.set_undefined_options('build',
+                                   ('build_lib', 'build_dir'))
+
+    def run(self):
+        sub = self.get_finalized_command('fetch_patchelf').patchelf_name
+        patchelf_dir = os.path.join(self.build_dir, sub)
+        if os.path.exists(patchelf_dir):
+            self.announce('Cleaning {}'.format(patchelf_dir), log.INFO)
+            shutil.rmtree(patchelf_dir)
 
 
 class InstallPatchelfCommand(Command):
@@ -233,31 +253,26 @@ class InstallPatchelfCommand(Command):
         return self.outputs
 
 
-class InstallCommand(OrigInstallCommand):
-    """Override the install command with our own version so that setuptools
-    can't use *its* version of the install command. This is necessary because
-    older versions of setuptools try very hard to install this package as an
-    egg, which won't work."""
+class InstallLibCommand(OrigInstallLibCommand):
+    """Override the install_lib command with our own version so that installing
+    this package always trigger install_patchelf. We need to override
+    install_lib in particular because this is the only installation command
+    that's *always* run (during `python setup.py install`, `pip install .`, and
+    `python setup.py bdist_egg`; the last one can happen if a setuptools-
+    powered project runs `python setup.py install`). We ensure that the install
+    command runs install_lib by including a very simple package in the setup()
+    call below."""
 
-    sub_commands = OrigInstallCommand.sub_commands + [
-        ('install_patchelf', lambda x: True)
-    ]
+    def run(self):
+        self.run_command('install_patchelf')
 
-    # Add options used by setuptools so that it thinks everything is ok.
-    user_options = OrigInstallCommand.user_options + [
-        ('old-and-unmanageable', None,
-         'provided for compatibility with setuptools'),
-        ('single-version-externally-managed', None,
-         'provided for compatibility with setuptools'),
-    ]
-    boolean_options = OrigInstallCommand.boolean_options + [
-        'old-and-unmanageable', 'single-version-externally-managed',
-    ]
+        # We already cleaned the build dir, but we want to re-clean it now that
+        # we're about to install the python package. Otherwise, the build dir
+        # gets installed too!
+        self.reinitialize_command('clean_patchelf')
+        self.run_command('clean_patchelf')
 
-    def initialize_options(self):
-        OrigInstallCommand.initialize_options(self)
-        self.old_and_unmanageable = None
-        self.single_version_externally_managed = None
+        return OrigInstallLibCommand.run(self)
 
 
 custom_cmds = {
@@ -265,12 +280,14 @@ custom_cmds = {
     'fetch_patchelf':   FetchPatchelfCommand,
     'build_patchelf':   BuildPatchelfCommand,
     'install_patchelf': InstallPatchelfCommand,
-    'install':          InstallCommand,
+    'clean_patchelf':   CleanPatchelfCommand,
+    'install_lib':      InstallLibCommand,
 }
 
 BuildCommand.sub_commands.append(('build_patchelf', lambda x: True))
 
-with open('README.md', 'r') as f:
+with open(os.path.join(os.path.dirname(__file__), 'README.md'), 'r') as f:
+    # Read from the file and strip out the badges.
     long_desc = re.sub(r'(^# patchelf-wrapper)\n\n(.+\n)*', r'\1', f.read())
 
 try:
@@ -313,4 +330,5 @@ setup(
     ],
 
     cmdclass=custom_cmds,
+    packages=['patchelf_wrapper'],
 )
