@@ -306,7 +306,7 @@ setup(
     url='https://github.com/jimporter/patchelf-wrapper',
 
     author='Jim Porter',
-    author_email='porterj@alum.rit.edu',
+    author_email='itsjimporter@gmail.com',
     license='BSD',
 
     classifiers=[
@@ -321,12 +321,10 @@ setup(
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.0',
-        'Programming Language :: Python :: 3.1',
-        'Programming Language :: Python :: 3.2',
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
     ],
 
     cmdclass=custom_cmds,
