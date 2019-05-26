@@ -1,11 +1,11 @@
 language: python
+dist: xenial
 
 python:
   - 2.7
-  - 3.3
-  - 3.4
   - 3.5
   - 3.6
+  - 3.7
 os:
   - linux
 env:
@@ -22,14 +22,17 @@ matrix:
   # (known as distribute at the time).
   include:
     - python: 2.7
+      os: linux
       env:
         - DEPS_COMMAND="pip install pip==1.2.1 && pip uninstall -y setuptools && pip install --index-url=https://pypi.python.org/simple/ -U distribute==0.6.20"
         - INSTALL_COMMAND="pip install ."
     - python: 2.7
+      os: linux
       env:
         - DEPS_COMMAND="pip install pip==1.2.1 && pip uninstall -y setuptools && pip install --index-url=https://pypi.python.org/simple/ -U distribute==0.6.20"
         - INSTALL_COMMAND="python setup.py install"
     - python: 2.7
+      os: linux
       env:
         - DEPS_COMMAND="pip install pip==1.2.1 && pip uninstall -y setuptools && pip install --index-url=https://pypi.python.org/simple/ -U distribute==0.6.20"
         - INSTALL_COMMAND="sed -i s/distutils.core/setuptools/ setup.py && python setup.py bdist_egg"
