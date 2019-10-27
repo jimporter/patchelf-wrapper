@@ -72,11 +72,11 @@ class FetchPatchelfCommand(Command):
         ('force', 'f', 'force download'),
     ]
 
-    patchelf_name = 'patchelf-0.9'
+    patchelf_name = 'patchelf-0.10'
     patchelf_url = ('https://nixos.org/releases/patchelf/{0}/{0}.tar.gz'
                     .format(patchelf_name))
-    sha256_hash = ('f2aa40a6148cb3b0ca807a1bf836b081' +
-                   '793e55ec9e5540a5356d800132be7e0a')
+    sha256_hash = ('b2deabce05c34ce98558c0efb965f209' +
+                   'de592197b2c88e930298d740ead09019')
 
     def initialize_options(self):
         self.download_dir = None
