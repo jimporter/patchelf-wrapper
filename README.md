@@ -29,7 +29,7 @@ defaults:
 
 ## License
 
-This project is licensed under the BSD 3-clause [license](LICENSE). Patchelf
+This project is licensed under the [BSD 3-clause license](LICENSE). Patchelf
 itself is licensed under the GPL, version 3.
 
 [pypi-image]: https://img.shields.io/pypi/v/patchelf-wrapper.svg
