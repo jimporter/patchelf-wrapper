@@ -35,4 +35,4 @@ itself is licensed under the GPL, version 3.
 [pypi-image]: https://img.shields.io/pypi/v/patchelf-wrapper.svg
 [pypi-link]: https://pypi.python.org/pypi/patchelf-wrapper
 [ci-image]: https://github.com/jimporter/patchelf-wrapper/workflows/build/badge.svg
-[ci-link]: https://github.com/jimporter/patchelf-wrapper/actions
+[ci-link]: https://github.com/jimporter/patchelf-wrapper/actions?query=workflow%3Abuild
