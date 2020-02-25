@@ -1,0 +1,67 @@
+name: build
+on:
+  push:
+  schedule:
+  - cron: '0 0 1 * *'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [2.7-distribute, 2.7, 3.5, 3.6, 3.7]
+        install-mode: [pip, setup.py, setuptools]
+      fail-fast: false
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v1
+      if: matrix.python-version != '2.7-distribute'
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Set up Python 2.7 for Distribute
+      uses: actions/setup-python@v1
+      if: matrix.python-version == '2.7-distribute'
+      with:
+        python-version: 2.7
+    - name: Install Distribute 0.6.20
+      if: matrix.python-version == '2.7-distribute'
+      run: |
+        pip install pip==1.2.1
+        pip uninstall -y setuptools
+        pip install --index-url=https://pypi.python.org/simple/ -U distribute==0.6.20
+    - name: Check that patchelf is uninstalled
+      run: |
+        ! which patchelf
+    - name: Install patchelf-wrapper (pip)
+      if: matrix.install-mode == 'pip'
+      run: |
+        pip install .
+    - name: Install patchelf-wrapper (setup.py)
+      if: matrix.install-mode == 'setup.py'
+      run: |
+        python setup.py install
+    - name: Install patchelf-wrapper (setuptools)
+      if: matrix.install-mode == 'setuptools'
+      run: |
+        sed -i s/distutils.core/setuptools/ setup.py
+        python setup.py bdist_egg
+    - name: Check that patchelf is installed
+      run: |
+        which patchelf
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.7
+    - name: Install flake8
+      run: |
+        pip install flake8
+    - name: Run lint
+      run: |
+        flake8 setup.py

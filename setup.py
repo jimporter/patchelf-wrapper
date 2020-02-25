@@ -18,6 +18,7 @@ try:
 except ImportError:
     from urllib import urlretrieve
 
+
 @contextmanager
 def pushd(dirname, makedirs=False, mode=0o777, exist_ok=False):
     old = os.getcwd()
@@ -60,7 +61,7 @@ class CheckPatchelfCommand(Command):
             self.announce('Found patchelf at {}'.format(output.strip()),
                           log.INFO)
             self.found_patchelf = True
-        except:
+        except Exception:
             self.announce('patchelf not found', log.INFO)
             self.found_patchelf = False
 
