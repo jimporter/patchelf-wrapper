@@ -31,8 +31,10 @@ def pushd(dirname, makedirs=False, mode=0o777, exist_ok=False):
                 raise
 
     os.chdir(dirname)
-    yield
-    os.chdir(old)
+    try:
+        yield
+    finally:
+        os.chdir(old)
 
 
 class CheckPatchelfCommand(Command):
