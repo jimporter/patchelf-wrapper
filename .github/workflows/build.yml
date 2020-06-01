@@ -34,6 +34,7 @@ jobs:
         pip install --index-url=https://pypi.python.org/simple/ -U distribute==0.6.20
     - name: Check that patchelf is uninstalled
       run: |
+        brew uninstall --force patchelf
         ! which patchelf
     - name: Install patchelf-wrapper (pip)
       if: matrix.install-mode == 'pip'
