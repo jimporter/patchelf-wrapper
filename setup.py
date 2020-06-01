@@ -1,5 +1,4 @@
 import errno
-import hashlib
 import os
 import re
 import shutil
@@ -13,10 +12,7 @@ from distutils.command.install_lib import install_lib as OrigInstallLibCommand
 
 from patchelf_wrapper import version
 
-try:
-    from urllib.request import urlretrieve
-except ImportError:
-    from urllib import urlretrieve
+root_dir = os.path.abspath(os.path.dirname(__file__))
 
 
 @contextmanager
@@ -47,14 +43,6 @@ class CheckPatchelfCommand(Command):
     def finalize_options(self):
         pass
 
-    @staticmethod
-    def sha256sum(filename, blocksize=65536):
-        sha = hashlib.sha256()
-        with open(filename, 'rb') as f:
-            for block in iter(lambda: f.read(blocksize), b''):
-                sha.update(block)
-        return sha.hexdigest()
-
     def run(self):
         try:
             output = subprocess.check_output(
@@ -68,79 +56,24 @@ class CheckPatchelfCommand(Command):
             self.found_patchelf = False
 
 
-class FetchPatchelfCommand(Command):
-    description = 'fetch the source distribution of patchelf'
-    user_options = [
-        ('download-dir=', 'd', 'download directory (where to save tarball)'),
-        ('force', 'f', 'force download'),
-    ]
-
-    patchelf_name = 'patchelf-0.10'
-    patchelf_url = ('https://nixos.org/releases/patchelf/{0}/{0}.tar.gz'
-                    .format(patchelf_name))
-    sha256_hash = ('b2deabce05c34ce98558c0efb965f209' +
-                   'de592197b2c88e930298d740ead09019')
-
-    def initialize_options(self):
-        self.download_dir = None
-        self.force = False
-
-    def finalize_options(self):
-        self.set_undefined_options('build',
-                                   ('build_base', 'download_dir'),
-                                   ('force', 'force'))
-        self.set_undefined_options('install', ('force', 'force'))
-
-    @staticmethod
-    def sha256sum(filename, blocksize=65536):
-        sha = hashlib.sha256()
-        with open(filename, 'rb') as f:
-            for block in iter(lambda: f.read(blocksize), b''):
-                sha.update(block)
-        return sha.hexdigest()
-
-    def run(self):
-        if not self.force:
-            self.run_command('check_patchelf')
-            if self.get_finalized_command('check_patchelf').found_patchelf:
-                return
-
-        if self.dry_run:
-            return
-
-        filename = os.path.basename(self.patchelf_url)
-        with pushd(self.download_dir, makedirs=True, exist_ok=True):
-            if ( os.path.exists(filename) and
-                 self.sha256sum(filename) == self.sha256_hash ):
-                self.announce('Using cached {}'.format(filename))
-            else:
-                self.announce('Downloading {}...'.format(self.patchelf_url),
-                              log.INFO)
-                urlretrieve(self.patchelf_url, filename)
-
-                if self.sha256sum(filename) != self.sha256_hash:
-                    raise RuntimeError(
-                        "{} doesn't match checksum".format(filename)
-                    )
-
-
 class BuildPatchelfCommand(Command):
     description = 'build the patchelf binary'
     user_options = [
-        ('download-dir=', 'd', 'download directory (where to find tarball)'),
         ('build-dir=', 'b', 'directory for compiled executable'),
         ('force', 'f', 'force building'),
     ]
 
+    patchelf_name = 'patchelf-0.10'
+    patchelf_tarball = os.path.join(root_dir, 'patchelf_wrapper',
+                                    '{}.tar.gz'.format(patchelf_name))
+
     def initialize_options(self):
-        self.download_dir = None
         self.build_dir = None
         self.force = False
 
     def finalize_options(self):
         self.set_undefined_options('install', ('force', 'force'))
         self.set_undefined_options('build',
-                                   ('build_base', 'download_dir'),
                                    ('build_lib', 'build_dir'),
                                    ('force', 'force'))
 
@@ -150,27 +83,19 @@ class BuildPatchelfCommand(Command):
             if self.get_finalized_command('check_patchelf').found_patchelf:
                 return
 
-        self.run_command('fetch_patchelf')
-
         if self.dry_run:
             return
 
-        filename = os.path.join(
-            self.download_dir,
-            os.path.basename(FetchPatchelfCommand.patchelf_url)
-        )
-        tar = tarfile.open(filename, 'r:gz')
-
         self.run_command('clean_patchelf')
 
+        tar = tarfile.open(self.patchelf_tarball, 'r:gz')
         with pushd(self.build_dir, makedirs=True, exist_ok=True):
-            sub = self.get_finalized_command('fetch_patchelf').patchelf_name
-
-            self.announce('Extracting to {}/{}'.format(self.build_dir, sub),
-                          log.INFO)
+            self.announce('Extracting to {}/{}'.format(
+                self.build_dir, self.patchelf_name
+            ), log.INFO)
             tar.extractall('.')
 
-            with pushd(sub):
+            with pushd(self.patchelf_name):
                 configure = ['./configure']
                 prefix = self.get_finalized_command('install').install_base
 
@@ -201,7 +126,7 @@ class CleanPatchelfCommand(Command):
                                    ('build_lib', 'build_dir'))
 
     def run(self):
-        sub = self.get_finalized_command('fetch_patchelf').patchelf_name
+        sub = self.get_finalized_command('build_patchelf').patchelf_name
         patchelf_dir = os.path.join(self.build_dir, sub)
         if os.path.exists(patchelf_dir):
             self.announce('Cleaning {}'.format(patchelf_dir), log.INFO)
@@ -240,7 +165,7 @@ class InstallPatchelfCommand(Command):
         if self.dry_run:
             return
 
-        sub = self.get_finalized_command('fetch_patchelf').patchelf_name
+        sub = self.get_finalized_command('build_patchelf').patchelf_name
         with pushd(os.path.join(self.build_dir, sub), makedirs=True,
                    exist_ok=True):
             subprocess.check_call(['make', 'install'])
@@ -280,7 +205,6 @@ class InstallLibCommand(OrigInstallLibCommand):
 
 custom_cmds = {
     'check_patchelf':   CheckPatchelfCommand,
-    'fetch_patchelf':   FetchPatchelfCommand,
     'build_patchelf':   BuildPatchelfCommand,
     'install_patchelf': InstallPatchelfCommand,
     'clean_patchelf':   CleanPatchelfCommand,

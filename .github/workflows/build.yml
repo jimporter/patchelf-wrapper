@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         python-version: [2.7-distribute, 2.7, 3.5, 3.6, 3.7]
-        install-mode: [pip, setup.py, setuptools]
+        install-mode: [pip, pip-sdist, setup.py, setuptools]
       fail-fast: false
 
     steps:
@@ -40,6 +40,11 @@ jobs:
       if: matrix.install-mode == 'pip'
       run: |
         pip install .
+    - name: Install patchelf-wrapper (pip sdist)
+      if: matrix.install-mode == 'pip-sdist'
+      run: |
+        python setup.py sdist
+        pip install dist/patchelf-wrapper-*.tar.gz
     - name: Install patchelf-wrapper (setup.py)
       if: matrix.install-mode == 'setup.py'
       run: |
