@@ -23,7 +23,6 @@ In addition, patchelf-wrapper contains the following setup commands beyond the
 defaults:
 
 * `check_patchelf`: Checks if patchelf is already installed on the system
-* `fetch_patchelf`: Fetches the patchelf tarball from the web
 * `build_patchelf`: Extract patchelf's source and build it
 * `install_patchelf`: Install patchelf to the chosen location
 
