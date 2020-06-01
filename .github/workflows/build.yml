@@ -44,7 +44,9 @@ jobs:
       if: matrix.install-mode == 'pip-sdist'
       run: |
         python setup.py sdist
-        pip install dist/patchelf-wrapper-*.tar.gz
+        rm patchelf_wrapper/patchelf-*.tar.gz
+        cd dist
+        pip install patchelf-wrapper-*.tar.gz
     - name: Install patchelf-wrapper (setup.py)
       if: matrix.install-mode == 'setup.py'
       run: |
