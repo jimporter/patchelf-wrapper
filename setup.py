@@ -63,7 +63,7 @@ class BuildPatchelfCommand(Command):
         ('force', 'f', 'force building'),
     ]
 
-    patchelf_name = 'patchelf-0.10'
+    patchelf_name = 'patchelf-0.11'
     patchelf_tarball = os.path.join(root_dir, 'patchelf_wrapper',
                                     '{}.tar.gz'.format(patchelf_name))
 

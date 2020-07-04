@@ -9,7 +9,7 @@ use with PyPI-hosted Python projects that depend on patchelf. If you're an
 end-user of patchelf, you should look elsewhere! (Perhaps your OS's package
 manager?)
 
-Currently, patchelf-wrapper installs **patchelf 0.10**.
+Currently, patchelf-wrapper installs **patchelf 0.11**.
 
 ## Usage
 
