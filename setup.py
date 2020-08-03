@@ -219,7 +219,7 @@ with open(os.path.join(os.path.dirname(__file__), 'README.md'), 'r') as f:
 
 try:
     import pypandoc
-    long_desc = pypandoc.convert(long_desc, 'rst', format='md')
+    long_desc = pypandoc.convert_text(long_desc, 'rst', format='md')
 except ImportError:
     pass
 
