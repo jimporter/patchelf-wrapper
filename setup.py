@@ -217,18 +217,13 @@ with open(os.path.join(os.path.dirname(__file__), 'README.md'), 'r') as f:
     # Read from the file and strip out the badges.
     long_desc = re.sub(r'(^# patchelf-wrapper)\n\n(.+\n)*', r'\1', f.read())
 
-try:
-    import pypandoc
-    long_desc = pypandoc.convert_text(long_desc, 'rst', format='md')
-except ImportError:
-    pass
-
 setup(
     name='patchelf-wrapper',
     version=version,
 
     description='A wrapper for patchelf',
     long_description=long_desc,
+    long_description_content_type='text/markdown',
     keywords='patchelf',
     url='https://github.com/jimporter/patchelf-wrapper',
 
